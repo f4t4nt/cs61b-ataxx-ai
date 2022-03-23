@@ -53,7 +53,7 @@ class AtaxxEnv(gym.Env):
     # BLACK WINS:  1
     # DRAW:        2
     def getWinner(self):
-        if self.numJumps == self.JUMP_LIMIT:
+        if self.num_jumps == self.JUMP_LIMIT:
             self.winner = 2
         elif self.whitePieces() == 0:
             self.winner = 1
@@ -87,12 +87,12 @@ class AtaxxEnv(gym.Env):
         return moves
 
     def getWhiteMoves(self):
-        self.whiteMoves = self.getMoves(0)
-        return self.whiteMoves
+        self.white_moves = self.getMoves(0)
+        return self.white_moves
 
     def getBlackMoves(self):
-        self.blackMoves = self.getMoves(1)
-        return self.blackMoves
+        self.black_moves = self.getMoves(1)
+        return self.black_moves
 
     def canMove(self, ci):
         return len(self.getMoves(ci)) > 0
@@ -110,9 +110,6 @@ class AtaxxEnv(gym.Env):
         return max(abs(m[0] - m[2]), abs(m[1] - m[3])) == 2
 
     def legalMove(self, ci, m):
-        if ci != self.turn:
-            raise
-            return False
         if m[0] == -1:
             return not self.canMove(ci)
         else:
@@ -122,16 +119,16 @@ class AtaxxEnv(gym.Env):
                 self.isJump(m))
 
     def makeMove(self, ci, m):
-        if not self.legalMove(ci, m):
+        if ci != self.turn or not self.legalMove(ci, m):
             raise
             return False
         if m[0] != -1:
             if self.isJump(m):
-                self.numJumps += 1
+                self.num_jumps += 1
                 self.setSquareCR(m[0], m[1], -1)
                 self.incrPieces(ci, -1)
             else:
-                self.numJumps = 0
+                self.num_jumps = 0
             sq = self.index(m[2], m[3])
             self.setSquareSq(sq, ci)
             self.incrPieces(ci, 1)
@@ -145,17 +142,23 @@ class AtaxxEnv(gym.Env):
         return True
 
     def __init__(self):
-        self.action_space = Tuple((Discrete(self.SIDE_LENGTH), Discrete(self.SIDE_LENGTH), Discrete(5, start = -2), Discrete(5, start = -2)))
+        # self.action_space = Tuple((Discrete(self.SIDE_LENGTH), Discrete(self.SIDE_LENGTH), Discrete(5, start = -2), Discrete(5, start = -2)))
+        # action = col * (25 * SIDE_LENGTH) + row * 25 + (dc + 2) * 5 + (dr + 2)
+        self.action_space = Discrete(25 * self.SIDE_LENGTH ** 2)
         self.observation_space = MultiDiscrete([4] * self.SIDE_LENGTH ** 2)
         
     def getObservation(self):
         observation = [ ]
         for row in range(self.SIDE_LENGTH):
             for col in range(self.SIDE_LENGTH):
-                observation += [ self.getSquareCR(col, row) ]
+                observation += [ self.getSquareCR(col, row) + 1 ]
         return observation
         
     def step(self, action):
+        action = (action // (self.SIDE_LENGTH * 25), \
+            (action % (self.SIDE_LENGTH * 25)) // 25, \
+            (action % 25) // 5 - 2, \
+            action % 5 - 2)
         if action[2] == 0 and action[3] == 0:
             m = [ -1, -1, -1, -1 ]
         else:
@@ -183,7 +186,18 @@ class AtaxxEnv(gym.Env):
                 winner = "draw"
             return ( self.getObservation(), reward, done, { "winner": winner } )
 
-    def reset(self):
+    def setWalls(self, col0, row0):
+        col1, row1 = self.SIDE_LENGTH - 1 - col0, self.SIDE_LENGTH - 1 - row0
+        if self.getSquareCR(col0, row0) == -1 and \
+            self.getSquareCR(col0, row1) == -1 and \
+            self.getSquareCR(col0, row1) == -1 and \
+            self.getSquareCR(col0, row1) == -1:
+            self.setSquareCR(col0, row0, 2)
+            self.setSquareCR(col0, row1, 2)
+            self.setSquareCR(col1, row0, 2)
+            self.setSquareCR(col1, row1, 2)
+
+    def reset(self, wall_p):
         self.board = [ 2 ] * self.SIDE_LENGTH_EXTENDED ** 2
         for col in range(self.SIDE_LENGTH):
             for row in range(self.SIDE_LENGTH):
@@ -194,10 +208,14 @@ class AtaxxEnv(gym.Env):
         self.setSquareCR(self.SIDE_LENGTH - 1, self.SIDE_LENGTH - 1, 1)
         self.turn = 0
         self.pieces = [ 2, 2 ]
-        self.numJumps = 0
+        self.num_jumps = 0
         self.winner = -1
-        self.whiteMoves = [ ]
-        self.blackMoves = [ ]
+        self.white_moves = [ ]
+        self.black_moves = [ ]
+        for col in range((self.SIDE_LENGTH + 1) // 2):
+            for row in range((self.SIDE_LENGTH + 1) // 2):
+                if random.random() < wall_p:
+                    self.setWalls(col, row)
         return self.getObservation()
 
     def render(self, mode='human', close=False):

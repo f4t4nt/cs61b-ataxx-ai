@@ -1,24 +1,23 @@
 import gym
 import gym_ataxx
+
 env = gym.make('ataxx-v0')
-w, l, d = 0, 0, 0
+win, lose, draw = 0, 0, 0
 while True:
-    prev = env.reset()
-    # env.render()
+    prev = env.reset(wall_p = 0.2)
+    env.render()
     while True:
         action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
-        # if prev != observation:
-        #     print(action)
-        #     env.render()
-        #     x = 1
+        if prev != observation:
+            env.render()
         prev = observation
         if info["winner"] == "white":
-            w += 1
+            win += 1
         elif info["winner"] == "black":
-            l += 1
+            lose += 1
         elif info["winner"] == "draw":
-            d += 1
+            draw += 1
         if done:
             break
-    print('W', w, 'L', l, 'D', d)
+    # print('W', win, 'L', lose, 'D', draw)
