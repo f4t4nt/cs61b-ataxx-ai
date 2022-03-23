@@ -1,0 +1,1 @@
+from gym_ataxx.envs.ataxx_env import AtaxxEnv
