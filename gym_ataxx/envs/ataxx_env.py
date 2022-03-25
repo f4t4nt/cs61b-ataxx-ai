@@ -1,12 +1,10 @@
 import gym
-from gym.spaces import Discrete, MultiDiscrete, Tuple
+from gym.spaces import Box, Discrete, MultiDiscrete, Tuple
+import jax.numpy as jnp
 import random
 
 class AtaxxEnv(gym.Env):
     metadata = {'render.modes': ['human']}
-
-    SIDE_LENGTH, JUMP_LIMIT = 7, 25
-    SIDE_LENGTH_EXTENDED = SIDE_LENGTH + 4
 
     def index(self, col, row):
         return (col + 2) * self.SIDE_LENGTH_EXTENDED + (row + 2)
@@ -142,17 +140,22 @@ class AtaxxEnv(gym.Env):
         return True
 
     def __init__(self):
-        # self.action_space = Tuple((Discrete(self.SIDE_LENGTH), Discrete(self.SIDE_LENGTH), Discrete(5, start = -2), Discrete(5, start = -2)))
+        self.SIDE_LENGTH = 7
+        self.SIDE_LENGTH_EXTENDED = self.SIDE_LENGTH + 4
+        self.JUMP_LIMIT = 25
         # action = col * (25 * SIDE_LENGTH) + row * 25 + (dc + 2) * 5 + (dr + 2)
+        self.T = 0
         self.action_space = Discrete(25 * self.SIDE_LENGTH ** 2)
-        self.observation_space = MultiDiscrete([4] * self.SIDE_LENGTH ** 2)
+        # self.observation_space = Box(low = -1, high = 2, shape=(self.SIDE_LENGTH, self.SIDE_LENGTH))
+        # self.observation_space = MultiDiscrete([4] * self.SIDE_LENGTH ** 2)
+        self.observation_space = MultiDiscrete([1] * 4 * self.SIDE_LENGTH ** 2)
         
     def getObservation(self):
-        observation = [ ]
+        board = jnp.zeros([4 * self.SIDE_LENGTH ** 2])
         for row in range(self.SIDE_LENGTH):
             for col in range(self.SIDE_LENGTH):
-                observation += [ self.getSquareCR(col, row) + 1 ]
-        return observation
+                board = board.at[row * 4 * self.SIDE_LENGTH + col * 4 + self.getSquareCR(col, row) + 1].set(1)
+        return board
         
     def step(self, action):
         action = (action // (self.SIDE_LENGTH * 25), \
@@ -198,6 +201,7 @@ class AtaxxEnv(gym.Env):
             self.setSquareCR(col1, row1, 2)
 
     def reset(self, wall_p):
+        self.T += 1
         self.board = [ 2 ] * self.SIDE_LENGTH_EXTENDED ** 2
         for col in range(self.SIDE_LENGTH):
             for row in range(self.SIDE_LENGTH):
