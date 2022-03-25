@@ -167,7 +167,7 @@ class AtaxxEnv(gym.Env):
         else:
             m = [ action[0], action[1], action[0] + action[2], action[1] + action[3] ]
         if not self.legalMove(0, m):
-            return (self.getObservation(), -1000, False, { "winner": "n/a" } )
+            return (self.getObservation(), -1, False, { "winner": "n/a" } )
         else:
             self.makeMove(0, m)
             if self.canBlackMove():
@@ -175,7 +175,7 @@ class AtaxxEnv(gym.Env):
             else:
                 m = [ -1, -1, -1, -1 ]
             self.makeMove(1, m)
-            reward = -1
+            reward = 1
             done = (self.getWinner() != -1)
             winner = "n/a"
             if self.winner == 0:
