@@ -1,3 +1,4 @@
+from gym_ataxx.envs.ataxx_env import AtaxxEnv
 from gym.envs.registration import register
 
 register(
