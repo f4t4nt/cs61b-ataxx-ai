@@ -1,11 +1,11 @@
 import numpy as np
 import random as rd
 
-#  1: player 1 to move
+#  1: red
 #  0: empty
-# -1: player 2
+# -1: blue
 # -2: wall
-class AtaxxBoard():
+class Board():
 
     def __init__(self, side_length = 7, jump_limit = 25, wall_p = 0.2, board = np.zeros(1)):
         if np.all(board == np.zeros(1)):
@@ -21,7 +21,7 @@ class AtaxxBoard():
             self.pieces = board - self.walls
             self.board = board
 
-    def get_board(self):
+    def getBoard(self):
         self.board = self.pieces + self.walls
         return self.board
 
@@ -41,10 +41,10 @@ class AtaxxBoard():
                     self.walls[col0, row1] = 0
                     self.walls[col1, row0] = 0
                     self.walls[col1, row1] = 0
-        self.get_board()
+        self.getBoard()
         self.num_jumps = 0
 
-    def get_winner(self):
+    def getWinner(self):
         if self.num_jumps == self.JUMP_LIMIT:
             return (0, True)
         p1_pieces = np.sum(self.pieces == 1)
@@ -53,7 +53,7 @@ class AtaxxBoard():
             return (-1, True)
         if p2_pieces == 0:
             return (1, True)
-        if len(self.get_moves(-1)) > 0 or len(self.get_moves(1)) > 0:
+        if len(self.getMoves(-1)) > 0 or len(self.getMoves(1)) > 0:
             return (0, False)
         if p1_pieces > p2_pieces:
             return (1, True)
@@ -62,8 +62,8 @@ class AtaxxBoard():
         if p1_pieces == p2_pieces:
             return (0, True)
         
-    def get_moves(self, player):
-        self.get_board()
+    def getMoves(self, player):
+        self.getBoard()
         moves = []
         for col in range(2, self.SIDE_LENGTH + 2):
             for row in range(2, self.SIDE_LENGTH + 2):
@@ -76,24 +76,24 @@ class AtaxxBoard():
             moves.append((0, 0, 0, 0))
         return moves
 
-    def make_move(self, player, move):
+    def makeMove(self, player, move):
         assert player == 1
-        assert move in self.get_moves(player)
+        assert move in self.getMoves(player)
         if move != (0, 0, 0, 0):
             col0, row0, col1, row1 = move
             if max(abs(col0 - col1), abs(row0 - row1)) > 1:
                 self.num_jumps += 1
                 self.pieces[col0, row0] = 0
             self.pieces[col1, row1] = player
-            self.flip_pieces(col1, row1, player)
+            self.flipPieces(col1, row1, player)
 
-    def flip_pieces(self, col, row, player):
+    def flipPieces(self, col, row, player):
         for dc in range(-1, 2):
             for dr in range(-1, 2):
                 if self.pieces[col + dc, row + dr] == -player:
                     self.pieces[col + dc, row + dr] = player
 
-    def to_string(self):
+    def toString(self):
         board_str = ""
         for col in range(2, self.SIDE_LENGTH + 2):
             for row in range(2, self.SIDE_LENGTH, + 2):
@@ -101,8 +101,8 @@ class AtaxxBoard():
             board_str += "\n"
         return board_str
 
-    def to_string_readable(self):
-        self.get_board()
+    def toStringReadable(self):
+        self.getBoard()
         board_str = ""
         for row in range(self.SIDE_LENGTH + 1, 1, -1):
             board_str += str(row - 1)

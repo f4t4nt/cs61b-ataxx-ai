@@ -1,1 +1,1 @@
-wheeeeee... ggez??
+Initial attempt at coding an AI for Ataxx using OpenAI's gym for the environment and coax for the agent

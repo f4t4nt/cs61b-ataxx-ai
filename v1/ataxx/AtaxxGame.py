@@ -1,30 +1,30 @@
 from __future__ import print_function
-from lib2to3.pgen2.token import AT
-# import sys
-# sys.path.append('..')
-from ataxx_logic import AtaxxBoard
+import sys
+sys.path.append('..')
+from game import Game
+from .AtaxxLogic import Board
 import numpy as np
 
-class AtaxxGame:
+class AtaxxGame(Game):
     
     def __init__(self, side_length = 7, jump_limit = 25, wall_p = 0.2):
         self.SIDE_LENGTH = side_length
         self.jump_limit = jump_limit
         self.wall_p = wall_p
 
-    def get_init_board(self):
-        self.init_board = AtaxxBoard(self.SIDE_LENGTH, self.jump_limit, self.wall_p)
+    def getInitBoard(self):
+        self.init_board = Board(self.SIDE_LENGTH, self.jump_limit, self.wall_p)
         return self.init_board.board
 
-    def get_board_shape(self):
+    def getBoardShape(self):
         self.board_shape = (self.SIDE_LENGTH, self.SIDE_LENGTH)
         return self.board_shape
 
-    def get_action_size(self):
+    def getActionSize(self):
         self.action_size = 25 * self.SIDE_LENGTH ** 2
         return self.action_size
 
-    def idx_to_move(self, move):
+    def idxToMove(self, move):
         col0 = move // (self.SIDE_LENGTH * 25) + 2
         row0 = (move % (self.SIDE_LENGTH * 25)) // 25 + 2
         dc = (move % 25) // 5 - 2
@@ -35,28 +35,28 @@ class AtaxxGame:
             col1, row1 = col0 + dc, row0 + dr
         return (col0, row0, col1, row1)
 
-    def board_to_class(self, board):
-        return AtaxxBoard(board)
+    def boardToClass(self, board):
+        return Board(board)
 
-    def get_next_state(self, board, player, move):
-        board = self.board_to_class(board)
-        col0, row0, col1, row1 = self.idx_to_move(move)
-        board.make_move(player, (col0, row0, col1, row1))
+    def getNextState(self, board, player, move):
+        board = self.boardToClass(board)
+        col0, row0, col1, row1 = self.idxToMove(move)
+        board.makeMove(player, (col0, row0, col1, row1))
         return (board.board, -player)
     
-    def get_valid_moves(self, board, player):
-        board = self.board_to_class(board)
+    def getValidMoves(self, board, player):
+        board = self.boardToClass(board)
         valid_moves = np.zeros(25 * self.SIDE_LENGTH ** 2)
-        valid_moves_list = board.get_moves(player)
+        valid_moves_list = board.getMoves(player)
         for move in range(25 * self.SIDE_LENGTH ** 2):
-            col0, row0, col1, row1 = self.idx_to_move(move)
+            col0, row0, col1, row1 = self.idxToMove(move)
             if (col0, row0, col1, row1) in valid_moves_list:
                 valid_moves[move] = 1
         return valid_moves
     
-    def get_game_ended(self, board, player):
-        board = self.board_to_class(board)
-        winner, ended = board.get_winner()
+    def getGameEnded(self, board, player):
+        board = self.boardToClass(board)
+        winner, ended = board.getWinner()
         if ended:
             if winner == player:
                 return 1
@@ -67,11 +67,11 @@ class AtaxxGame:
         else:
             return 0
 
-    def get_canonical_form(self, board, player):
-        board = self.board_to_class(board)
+    def getCanonicalForm(self, board, player):
+        board = self.boardToClass(board)
         return board.pieces * player + board.walls
 
-    def get_symmetries(self, board, pi):
+    def getSymmetries(self, board, pi):
         sym_forms = []
         pi_board = np.reshape(pi, (self.SIDE_LENGTH, self.SIDE_LENGTH, 5, 5))
         for rot in range(4):
@@ -86,10 +86,12 @@ class AtaxxGame:
                 sym_forms += [(sym_board, sym_pi_board.ravel())]
         return sym_forms
     
-    def string_representation(self, board):
-        return board.to_string()
+    def stringRepresentation(self, board):
+        return board.toString()
+    
+    def stringRepresentationReadable(self, board):
+        return board.toStringReadable()
 
-board = AtaxxBoard()
-game = AtaxxGame()
-game.get_symmetries(board, game.get_valid_moves(board, 1))
-x = 1
+    @staticmethod
+    def display(board): # TODO
+        pass
