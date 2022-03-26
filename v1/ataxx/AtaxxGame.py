@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 sys.path.append('..')
-from game import Game
+from Game import Game
 from .AtaxxLogic import Board
 import numpy as np
 
@@ -16,7 +16,7 @@ class AtaxxGame(Game):
         self.init_board = Board(self.SIDE_LENGTH, self.jump_limit, self.wall_p)
         return self.init_board.board
 
-    def getBoardShape(self):
+    def getBoardSize(self):
         self.board_shape = (self.SIDE_LENGTH, self.SIDE_LENGTH)
         return self.board_shape
 
@@ -25,8 +25,8 @@ class AtaxxGame(Game):
         return self.action_size
 
     def idxToMove(self, move):
-        col0 = move // (self.SIDE_LENGTH * 25) + 2
-        row0 = (move % (self.SIDE_LENGTH * 25)) // 25 + 2
+        col0 = move // (self.SIDE_LENGTH * 25)
+        row0 = (move % (self.SIDE_LENGTH * 25)) // 25
         dc = (move % 25) // 5 - 2
         dr = move % 5 - 2
         if dc == 0 and dr == 0:
@@ -36,7 +36,7 @@ class AtaxxGame(Game):
         return (col0, row0, col1, row1)
 
     def boardToClass(self, board):
-        return Board(board)
+        return Board().setToBoard(board)
 
     def getNextState(self, board, player, move):
         board = self.boardToClass(board)
@@ -87,9 +87,11 @@ class AtaxxGame(Game):
         return sym_forms
     
     def stringRepresentation(self, board):
+        board = self.boardToClass(board)
         return board.toString()
     
     def stringRepresentationReadable(self, board):
+        board = self.boardToClass(board)
         return board.toStringReadable()
 
     @staticmethod
