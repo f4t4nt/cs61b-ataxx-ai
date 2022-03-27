@@ -6,10 +6,10 @@ class RandomPlayer():
         self.game = game
 
     def play(self, board):
-        idx = rd.randint(0, self.game.get_action_size())
-        valid_moves = self.game.get_valid_moves(board, 1)
+        idx = rd.randint(0, self.game.getActionSize())
+        valid_moves = self.game.getValidMoves(board, 1)
         while valid_moves[idx] == 0:
-            idx = rd.randint(0, self.game.get_action_size())
+            idx = rd.randint(0, self.game.getActionSize())
         return idx
 
 class HumanAtaxxPlayer(): # TODO
@@ -18,10 +18,10 @@ class HumanAtaxxPlayer(): # TODO
         self.game = game
 
     def play(self, board):
-        idx = rd.randint(0, self.game.get_action_size())
-        valid_moves = self.game.get_valid_moves(board, 1)
+        idx = rd.randint(0, self.game.getActionSize())
+        valid_moves = self.game.getValidMoves(board, 1)
         while valid_moves[idx] == 0:
-            idx = rd.randint(0, self.game.get_action_size())
+            idx = rd.randint(0, self.game.getActionSize())
         return idx
 
 class GreedyAtaxxPlayer(): # TODO
@@ -30,8 +30,8 @@ class GreedyAtaxxPlayer(): # TODO
         self.game = game
 
     def play(self, board):
-        idx = rd.randint(0, self.game.get_action_size())
-        valid_moves = self.game.get_valid_moves(board, 1)
+        idx = rd.randint(0, self.game.getActionSize())
+        valid_moves = self.game.getValidMoves(board, 1)
         while valid_moves[idx] == 0:
-            idx = rd.randint(0, self.game.get_action_size())
+            idx = rd.randint(0, self.game.getActionSize())
         return idx

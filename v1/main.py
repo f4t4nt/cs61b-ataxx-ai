@@ -2,8 +2,6 @@ import logging
 
 import coloredlogs
 
-# import sys
-
 from Coach import Coach
 from ataxx.AtaxxGame import AtaxxGame as Game
 from ataxx.pytorch.NNet import NNetWrapper as nn
@@ -22,6 +20,8 @@ args = dotdict({
     'numMCTSSims': 25,          # Number of games moves for MCTS to simulate.
     'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
+    'maxDepth': 25,
+    'maxIters': 1000,
 
     'checkpoint': './temp/',
     'load_model': False,
@@ -30,11 +30,9 @@ args = dotdict({
 
 })
 
-# sys.setrecursionlimit(5000)
-
 def main():
     log.info('Loading %s...', Game.__name__)
-    g = Game(5)
+    g = Game()
 
     log.info('Loading %s...', nn.__name__)
     nnet = nn(g)

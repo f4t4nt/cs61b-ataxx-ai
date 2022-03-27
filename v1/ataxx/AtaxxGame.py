@@ -22,16 +22,17 @@ class AtaxxGame(Game):
 
     def getActionSize(self):
         self.action_size = 25 * self.SIDE_LENGTH ** 2
+        self.idx_denom = 25 * self.SIDE_LENGTH
         return self.action_size
 
     def idxToMove(self, move):
-        col0 = move // (self.SIDE_LENGTH * 25)
-        row0 = (move % (self.SIDE_LENGTH * 25)) // 25
         dc = (move % 25) // 5 - 2
         dr = move % 5 - 2
         if dc == 0 and dr == 0:
             col0, row0, col1, row1 = [0] * 4
         else:
+            col0 = move // self.idx_denom
+            row0 = (move % self.idx_denom) // 25
             col1, row1 = col0 + dc, row0 + dr
         return (col0, row0, col1, row1)
 
@@ -97,3 +98,27 @@ class AtaxxGame(Game):
     @staticmethod
     def display(board): # TODO
         pass
+
+# random play for testing
+
+# class RandomPlayer():
+
+#     def __init__(self, game):
+#         self.game = game
+
+#     def play(self, board, player):
+#         idx = np.random.randint(0, self.game.getActionSize())
+#         valid_moves = self.game.getValidMoves(board, player)
+#         while valid_moves[idx] == 0:
+#             idx = np.random.randint(0, self.game.getActionSize())
+#         return idx
+
+# while True:
+#     game = AtaxxGame()
+#     board = game.getInitBoard()
+#     player = RandomPlayer(game)
+#     player_idx = 1
+#     print(game.stringRepresentationReadable(board))
+#     while game.getGameEnded(board, player_idx) == 0:
+#         board, player_idx = game.getNextState(board, player_idx, player.play(board, player_idx))
+#         print(game.stringRepresentationReadable(board))
