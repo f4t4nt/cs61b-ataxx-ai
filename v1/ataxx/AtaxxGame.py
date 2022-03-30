@@ -1,5 +1,7 @@
 from __future__ import print_function
 import sys
+
+from scipy import rand
 sys.path.append('..')
 from Game import Game
 from .AtaxxLogic import Board
@@ -47,13 +49,39 @@ class AtaxxGame(Game):
     
     def getValidMoves(self, board, player):
         board = self.boardToClass(board)
-        valid_moves = np.zeros(25 * self.SIDE_LENGTH ** 2)
+        moves1_count = 0
+        moves2_count = 0
+        valid_moves1 = np.zeros(25 * self.SIDE_LENGTH ** 2)
+        valid_moves2 = np.zeros(25 * self.SIDE_LENGTH ** 2)
         valid_moves_list = board.getMoves(player)
         for move in range(25 * self.SIDE_LENGTH ** 2):
             col0, row0, col1, row1 = self.idxToMove(move)
             if (col0, row0, col1, row1) in valid_moves_list:
-                valid_moves[move] = 1
-        return valid_moves
+                if col1 == col0 and row1 == row0 and (col0 or row0):
+                    pass
+                if abs(col1-col0) == 2 or abs(row1 - row0) == 2:
+                    valid_moves2[move] = 1
+                    moves2_count += 1
+                else:
+                    valid_moves1[move] = 1
+                    moves1_count += 1
+ 
+        if moves1_count == 0:
+            return valid_moves2
+        if moves2_count == 0:
+            return valid_moves1
+        
+        ratio = 1
+        if moves1_count > 5:
+            ratio = moves1_count / (2 * moves2_count)
+        else:
+            ratio = moves1_count / moves2_count
+
+        ratio = min(ratio, 1.)
+
+        valid_moves2 = valid_moves2 * ratio
+        valid_moves1 += valid_moves2
+        return valid_moves1
     
     def getGameEnded(self, board, player):
         board = self.boardToClass(board)

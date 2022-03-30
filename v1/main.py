@@ -21,11 +21,11 @@ args = dotdict({
     'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
     'maxDepth': 25,
-    'maxIters': 1000,
+    'maxTurns': 1000,
 
     'checkpoint': './temp/',
-    'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'load_model': True,
+    'load_folder_file': ('temp','checkpoint_3.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })

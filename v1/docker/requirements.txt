@@ -1,11 +1,10 @@
-cffi==1.11.5
 coloredlogs==14.0
 cython==0.28.3
 flask==1.0
 gitpython==2.1.11
 matplotlib
 numpy==1.21
-pandas==0.23.1
+pandas
 scipy
 scikit-learn
 scikit-image
@@ -13,3 +12,4 @@ torchfile==0.1.0
 torchvision==0.2.1
 tqdm==4.19.5
 visdom==0.1.7
+cffi
