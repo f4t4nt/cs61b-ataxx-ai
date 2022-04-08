@@ -1,5 +1,7 @@
 from __future__ import print_function
 import sys
+
+from scipy import rand
 sys.path.append('..')
 from Game import Game
 from .AtaxxLogic import Board
@@ -52,6 +54,8 @@ class AtaxxGame(Game):
         for move in range(25 * self.SIDE_LENGTH ** 2):
             col0, row0, col1, row1 = self.idxToMove(move)
             if (col0, row0, col1, row1) in valid_moves_list:
+                if col1 == col0 and row1 == row0 and (col0 or row0):
+                    pass
                 valid_moves[move] = 1
         return valid_moves
     

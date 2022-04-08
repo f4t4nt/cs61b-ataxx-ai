@@ -28,7 +28,7 @@ class Arena():
         self.game = game
         self.display = display
 
-    def playGame(self, maxIters, verbose=False):
+    def playGame(self, maxTurns, verbose=False):
         """
         Executes one episode of a game.
 
@@ -42,7 +42,7 @@ class Arena():
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
-        while self.game.getGameEnded(board, curPlayer) == 0 and it < maxIters:
+        while self.game.getGameEnded(board, curPlayer) == 0 and it < maxTurns:
             it += 1
             if verbose:
                 assert self.display
@@ -61,9 +61,23 @@ class Arena():
             assert self.display
             print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
             self.display(board)
-        return curPlayer * self.game.getGameEnded(board, curPlayer) if it < maxIters else 1 if np.sum(board == curPlayer) > np.sum(board == -curPlayer) else -1
 
-    def playGames(self, num, maxIters, verbose=False):
+        if it < maxTurns:
+            return curPlayer * self.game.getGameEnded(board, curPlayer)
+        else:
+            curPPeices = np.sum(board == curPlayer)
+            otherPPeices = np.sum(board == -curPlayer)
+            if curPPeices == otherPPeices:
+                return 0
+            if curPPeices > otherPPeices + 10:
+                return 1
+            if otherPPeices > curPPeices  + 10:
+                return -1
+            if curPPeices > otherPPeices:
+                return 0.1
+            return -0.1
+
+    def playGames(self, num, maxTurns, verbose=False):
         """
         Plays num games in which player1 starts num/2 games and player2 starts
         num/2 games.
@@ -79,7 +93,7 @@ class Arena():
         twoWon = 0
         draws = 0
         for _ in tqdm(range(num), desc="Arena.playGames (1)"):
-            gameResult = self.playGame(maxIters=maxIters, verbose=verbose)
+            gameResult = self.playGame(maxTurns=maxTurns, verbose=verbose)
             if gameResult == 1:
                 oneWon += 1
             elif gameResult == -1:
@@ -90,7 +104,7 @@ class Arena():
         self.player1, self.player2 = self.player2, self.player1
 
         for _ in tqdm(range(num), desc="Arena.playGames (2)"):
-            gameResult = self.playGame(verbose=verbose)
+            gameResult = self.playGame(maxTurns=maxTurns, verbose=verbose)
             if gameResult == -1:
                 oneWon += 1
             elif gameResult == 1:
