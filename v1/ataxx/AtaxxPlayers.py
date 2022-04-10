@@ -1,5 +1,6 @@
 import random as rd
 from signal import SIG_DFL
+from . import AtaxxGame as Game
 
 class RandomPlayer():
 
@@ -15,42 +16,36 @@ class RandomPlayer():
 
 class HumanAtaxxPlayer():
 
-    def __init__(self, game):
+    def __init__(self, game: Game):
         self.game = game
         self.SIDE_LENGTH = self.game.getBoardSize()[0]
 
     def play(self, board):
+        self.game.display(board)
         valid = self.game.getValidMoves(board, 1)
+        valid_move = {}
         for i in range(len(valid)):
             if valid[i]:
                 move = self.game.idxToMove(i)
-                col0 = chr(ord('1') + move[0])
-                row0 = chr(ord('a') + move[1])
-                col1 = chr(ord('1') + move[2])
-                row1 = chr(ord('a') + move[3])
-                print("{}{}-{}{}".format(col0, row0, col1, row1))
+                col0 = chr(ord('1') + int(move[0]))
+                row0 = chr(ord('a') + int(move[1]))
+                col1 = chr(ord('1') + int(move[2]))
+                row1 = chr(ord('a') + int(move[3]))
+                valid_move[moveToStr((row0, col0, row1, col1))] = i
+                valid_move[moveToStr((col0, row0, col1, row1))] = i
+                # print("{}{}-{}{}".format(col0, row0, col1, row1))
         while True:
             move = input("Your move: ")
             if move == 'exit':
                 return -1
-            move = move.split('-')
-            if len(move) != 2:
-                print("Invalid move")
-                continue
-            col0 = ord(move[0][0]) - ord('1')
-            row0 = ord(move[0][1]) - ord('a')
-            col1 = ord(move[1][0]) - ord('1')
-            row1 = ord(move[1][1]) - ord('a')
-            if not (0 <= col0 < self.SIDE_LENGTH and \
-                0 <= row0 < self.SIDE_LENGTH and \
-                0 <= col1 < self.SIDE_LENGTH and \
-                0 <= row1 < self.SIDE_LENGTH):
-                print("Invalid move")
-                continue
-            move = self.game.moveToIdx((col0, row0, col1, row1))
-            if valid[move]:
-                return move
+            if move in valid_move:
+                return valid_move[move]
+
             print("Invalid move")
+
+def moveToStr(tupl):
+    return tupl[1] + tupl[0] + '-' + tupl[3] + tupl[2]
+
 
 class GreedyAtaxxPlayer(): # TODO
 

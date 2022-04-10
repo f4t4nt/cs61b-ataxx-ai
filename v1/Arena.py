@@ -74,8 +74,8 @@ class Arena():
             if otherPPeices > curPPeices  + 10:
                 return -1
             if curPPeices > otherPPeices:
-                return 0.1
-            return -0.1
+                return 0.01
+            return -0.01
 
     def playGames(self, num, maxTurns, verbose=False):
         """

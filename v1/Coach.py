@@ -65,7 +65,16 @@ class Coach():
 
             r = self.game.getGameEnded(board, self.curPlayer)
             if r == 0 and episodeStep > self.args.maxTurns:
-                r = -0.1
+                curPPeices = np.sum(board == self.curPlayer)
+                otherPPeices = np.sum(board == -self.curPlayer)
+                if curPPeices == otherPPeices:
+                    r = 0.01
+                elif curPPeices > otherPPeices + 10:
+                    r = 1
+                elif otherPPeices > curPPeices  + 10:
+                    r = -1
+                else:
+                    r = -0.0001
 
             if r != 0:
                 return [(x[0], x[2], r * ((-1) ** (x[1] != self.curPlayer))) for x in trainExamples]
@@ -93,7 +102,7 @@ class Coach():
                 # save the iteration examples to the history 
                 self.trainExamplesHistory.append(iterationTrainExamples)
 
-            if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
+            while len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 log.warning(
                     f"Removing the oldest entry in trainExamples. len(trainExamplesHistory) = {len(self.trainExamplesHistory)}")
                 self.trainExamplesHistory.pop(0)

@@ -8,9 +8,9 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "./v1/run.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
         },
         {
             "name": "Python: Current File with profiler",

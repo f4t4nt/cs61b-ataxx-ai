@@ -7,8 +7,16 @@ from Game import Game
 from .AtaxxLogic import Board
 import numpy as np
 
+
+chrs = {
+    -2: '#',
+    -1: 'O',
+    1: 'X',
+    2: '#',
+    0: ' ',
+}
+
 class AtaxxGame(Game):
-    
     def __init__(self, side_length = 7, jump_limit = 25, wall_p = 0.2):
         self.SIDE_LENGTH = side_length
         self.jump_limit = jump_limit
@@ -26,6 +34,14 @@ class AtaxxGame(Game):
         self.action_size = 25 * self.SIDE_LENGTH ** 2
         self.idx_denom = 25 * self.SIDE_LENGTH
         return self.action_size
+
+    def moveToidx(self, move):
+        (col0, row0, col1, row1) = move
+        dr = row1 - row0 + 2
+        dc = col1 - col0 + 2
+        if dr == dc and dr == 2:
+            return 0
+        return (col0 * self.SIDE_LENGTH + row0) * 25 + dc * 5 + dr
 
     def idxToMove(self, move):
         dc = (move % 25) // 5 - 2
@@ -54,8 +70,6 @@ class AtaxxGame(Game):
         for move in range(25 * self.SIDE_LENGTH ** 2):
             col0, row0, col1, row1 = self.idxToMove(move)
             if (col0, row0, col1, row1) in valid_moves_list:
-                if col1 == col0 and row1 == row0 and (col0 or row0):
-                    pass
                 valid_moves[move] = 1
         return valid_moves
     
@@ -100,8 +114,23 @@ class AtaxxGame(Game):
         return board.toStringReadable()
 
     @staticmethod
-    def display(board): # TODO
-        pass
+    def display(board: Board): # TODO
+        board_str = ""
+        side_length = len(board)
+        for row in range(side_length - 1, -1, -1):
+            board_str += chr(ord('1') + row)
+            board_str += " |"
+            for col in range(side_length):
+                board_str += chrs[board[row, col]] + "|"
+            board_str += '\n'
+            # board_str += "  |"
+            # for col in range(side_length):
+            #     board_str += "-+"
+            # board_str += '\n'
+        board_str += "  |"
+        for col in range(side_length):
+            board_str += chr(ord('a') + col) + "|"
+        print(board_str)
 
 # random play for testing
 
