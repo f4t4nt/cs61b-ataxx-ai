@@ -1,7 +1,7 @@
 coloredlogs==14.0
 cython==0.28.3
 flask==1.0
-gitpython==2.1.11
+gitpython==3.1.41
 matplotlib
 numpy==1.21
 pandas
